@@ -1,0 +1,138 @@
+"""
+A customer is a user which buys from the markeplace
+"""
+type Customer {
+  """
+  ID
+  """
+  id: ID! @id
+  """
+  Auth UID
+  """
+  uid: String! @unique
+  # Personal Information (both emailId and mobileNumber can't be null together)
+  """
+  Email id of the customer (unique)
+  """
+  emailId: String! @unique
+  """
+  Mobile number of the customer
+  """
+  mobileNumber: String
+  """
+  Name of the customer
+  """
+  name: String
+  # End of the personal information
+
+  # Customer's active engagements with products
+  # 1-to-n relationship with CustomerWishlist
+  """
+  Wishlists curated by this customer
+  """
+  wishlists: [CustomerWishlist!]!
+    @relation(name: "CustomerWishlistsRelation", onDelete: CASCADE)
+  # 1-to-n relationship with CustomerCartItem
+  """
+  Cart of the customer
+  """
+  cartItems: [CustomerCartItem!]!
+    @relation(name: "CustomerCartItemsRelation", onDelete: CASCADE)
+  """
+  Created at this time
+  """
+  createdAt: DateTime! @createdAt
+  """
+  Updated at this time
+  """
+  updatedAt: DateTime! @updatedAt
+}
+
+"""
+Wishlist curated by a customer
+"""
+type CustomerWishlist {
+  """
+  ID
+  """
+  id: ID! @id
+  # n-to-1 relationship with Customer
+  """
+  Customer who curated this list
+  """
+  customer: Customer!
+    @relation(name: "CustomerWishlistsRelation", onDelete: SET_NULL)
+  """
+  Name of this wishlist (unique for a customer)
+  """
+  listName: String!
+  # m-to-n relationship with Product
+  """
+  Products added to this list
+  """
+  products: [Product!]!
+    @relation(
+      link: TABLE
+      name: "WishlistedProductsRelation"
+      onDelete: SET_NULL
+    )
+  """
+  Created at this time
+  """
+  createdAt: DateTime! @createdAt
+  """
+  Updated at this time
+  """
+  updatedAt: DateTime! @updatedAt
+}
+
+"""
+Product Variants in a customer's cart
+"""
+type CustomerCartItem {
+  """
+  ID
+  """
+  id: ID! @id
+  # n-to-1 relationship with Customer
+  """
+  Customer who owns this cart
+  """
+  customer: Customer!
+    @relation(name: "CustomerCartItemsRelation", onDelete: SET_NULL)
+  # n-to-1 relationship with ProductVariant
+  """
+  Product added to the cart
+  """
+  product: Product!
+    @relation(name: "ProductsInCartRelation", onDelete: SET_NULL)
+  """
+  Price (in paisa) at which this product was added to the cart (to compare with current price)
+  """
+  addedAtPrice: Int!
+  """
+  Number of this product added to the cart
+  """
+  quantity: Int!
+  """
+  Is this item saved for later
+  """
+  savedForLater: Boolean! @default(value: false)
+  """
+  Created at this time
+  """
+  createdAt: DateTime! @createdAt
+  """
+  Updated at this time
+  """
+  updatedAt: DateTime! @updatedAt
+}
+
+## Relation tables for m-to-n relationships
+"""
+CustomerWishlist and ProductVariant m-to-n relation table for prisma
+"""
+type WishlistedProductsRelation @relationTable {
+  wishlist: CustomerWishlist!
+  product: Product!
+}

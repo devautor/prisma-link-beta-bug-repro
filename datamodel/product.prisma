@@ -1,0 +1,97 @@
+"""
+Product
+"""
+type Product {
+  """
+  ID
+  """
+  id: ID! @id
+  # start of product container info
+  """
+  Name of the product
+  """
+  name: String!
+  """
+  Name of the brand
+  """
+  brand: String!
+  """
+  Tags added to facilitate in search
+  """
+  tags: [String!] @scalarList(strategy: RELATION)
+  """
+  Markdown description
+  """
+  description: String!
+  # end of product's desc info
+  # Reviews and ratings
+  """
+  Average rating of the product as counts [rated1, rated2, rated3, rated4, rated5]
+  """
+  ratingsDistribution: [Int!]! @scalarList(strategy: RELATION)
+  # m-to-n relationship with Post
+  """
+  Posted in these posts
+  """
+  postedIn: [Post!]!
+    @relation(name: "PostsProductsRelation", onDelete: SET_NULL)
+  # m-to-n relationship with CustomerWishlist
+  """
+  Added to these wishlists
+  """
+  wishlistedIn: [CustomerWishlist!]!
+    @relation(name: "WishlistedProductsRelation", onDelete: SET_NULL)
+  # 1-to-n relationship with CustomerCartItem
+  """
+  Added to these carts
+  """
+  cartedIn: [CustomerCartItem!]!
+    @relation(name: "ProductsInCartRelation", onDelete: SET_NULL)
+  # end of reviews
+  """
+  Created at this time
+  """
+  createdAt: DateTime! @createdAt
+  """
+  Updated at this time
+  """
+  updatedAt: DateTime! @updatedAt
+}
+
+## POST
+"""
+A post to surface a bunch of products (maximum 5)
+"""
+type Post {
+  """
+  ID
+  """
+  id: ID! @id
+  """
+  Text content
+  """
+  text: String
+  # m-to-n relationship with Product
+  """
+  Products added to this post
+  """
+  products: [Product!]!
+    @relation(link: TABLE, name: "PostsProductsRelation", onDelete: SET_NULL)
+  """
+  Created at this time
+  """
+  createdAt: DateTime! @createdAt
+  """
+  Updated at this time
+  """
+  updatedAt: DateTime! @updatedAt
+}
+
+## Relation tables for m-to-n relationships
+"""
+Product and Post m-to-n relation table for prisma
+"""
+type PostsProductsRelation @relationTable {
+  post: Post!
+  product: Product!
+}

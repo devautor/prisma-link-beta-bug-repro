@@ -1,0 +1,8 @@
+endpoint: https://eu1.prisma.sh/kumar-gaurav/prisma-link-beta/dev
+datamodel:
+  - ./datamodel/product.prisma
+  - ./datamodel/customer.prisma
+
+generate:
+  - generator: typescript-client
+    output: ./generated/prisma-client/
